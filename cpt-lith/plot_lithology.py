@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 from mpl_toolkits.mplot3d import Axes3D
 
 # Load the data
@@ -10,7 +11,10 @@ collar_df = pd.read_csv('collar2.csv')
 lithology_df = pd.read_csv('lithology2.csv')
 
 # Define colors for SBT indices using a colormap
-SBT_colors = plt.cm.get_cmap('tab10', 9)  # Using a colormap with 9 distinct colors
+# SBT_colors = plt.cm.get_cmap('tab10', 9)  # Using a colormap with 9 distinct colors
+norm = plt.Normalize(1,9)
+SBT_colors = LinearSegmentedColormap.from_list("", ['#D3291C', '#B36A3F', '#4A5777', '#479085', '#7EC4A0', '#BDA464', '#EB9D4A', '#999999', '#DEDEDE'], N=9)
+
 
 # Define color gradient for penetration resistance
 penetration_resistance_colors = plt.cm.viridis
@@ -183,9 +187,13 @@ for bh in collar_df['borehole_id']:
         else:
             color = lithology_colors[lithology]
         
-        ax2.fill_between([y_proj-bhwidth, y_proj+bhwidth],
-                         start_elevation, end_elevation, 
-                         color=color, edgecolor='black')
+        # ax2.fill_between([y_proj-bhwidth, y_proj+bhwidth],
+        #                  start_elevation, end_elevation, 
+        #                  color=color, edgecolor='black')
+        
+        # or plot as line segments
+        ax2.plot([y_proj, y_proj], [start_elevation, end_elevation], color=color, linewidth=10)
+    
     
     # Add labels at the top of the borings
     bhtop = lithologies.start_elevation.max()
@@ -207,15 +215,29 @@ ax2.grid(which='both', alpha=0.4)
 if plot_type == 'SBT':
     handles = [plt.Line2D([0], [0], color=SBT_colors(i), lw=10) for i in range(9)]
     labels = [f'SBT {i+1}' for i in range(9)]
-else:
+elif plot_type == 'penetration_resistance':
     handles = [plt.Line2D([0], [0], color=penetration_resistance_colors(0.1), lw=10),
                plt.Line2D([0], [0], color=penetration_resistance_colors(0.9), lw=10)]
     labels = ['Low', 'High']
+else:
+    handles = [plt.Line2D([0], [0], color=friction_ratio_colors(0.1), lw=10),
+               plt.Line2D([0], [0], color=friction_ratio_colors(0.9), lw=10)]
+    labels = ['Low', 'High']
+    
 
 ax1.legend(handles, labels, loc='best', title="Soil Behavior Type" if plot_type == 'SBT' else plot_type.replace('_', ' ').title())
 
+# # Add colorbar
+# if plot_type != 'SBT':
+#     mappable = plt.cm.ScalarMappable(cmap=penetration_resistance_colors if plot_type == 'penetration_resistance' else friction_ratio_colors)
+#     mappable.set_array(lithology_df[plot_type])
+#     cbar = fig.colorbar(mappable, ax=ax1, orientation='vertical', fraction=0.02, pad=0.04)
+#     cbar.set_label(plot_type.replace('_', ' ').title())
+
+
+
 plt.tight_layout()
 
-fig.savefig("demo.svg", dpi=300, bbox_inches="tight")
+fig.savefig("demo2.svg", dpi=300, bbox_inches="tight")
 
 plt.show()

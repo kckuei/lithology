@@ -5,7 +5,7 @@ visualizing drillhole lithology
 
 plot isometric and 2d projection of spt borehole lithology
 
-[borehole lithology](https://github.com/kckuei/lithology/blob/main/borehole-lith/demo.svg)
+[borehole lithology](https://github.com/kckuei/lithology/blob/main/borehole-lith/demo.png)
 
 ## cpt-based soil behavior type lithology
 

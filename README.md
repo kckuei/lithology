@@ -11,4 +11,4 @@ plot isometric and 2d projection of spt borehole lithology
 
 plot isometric and 2d projection of cpt SBT lithology
 
-![cpt soil behavior type lithology]()
+![cpt soil behavior type lithology](https://github.com/kckuei/lithology/blob/main/cpt-lith/demo.svg)

@@ -5,8 +5,11 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 # Load the data
+# collar_df = pd.read_csv(r'..\borehole-lith\collar.csv')
+# lithology_df = pd.read_csv(r'..\borehole-lith\lithology.csv')
 collar_df = pd.read_csv(r'..\borehole-lith\collar.csv')
-lithology_df = pd.read_csv(r'..\borehole-lith\lithology.csv')
+lithology_df = pd.read_csv(r'resampled_lithology.csv')
+
 
 # Convert lithology to numerical codes
 lithology_df['lithology_code'] = pd.Categorical(lithology_df['lithology']).codes
@@ -36,17 +39,6 @@ grid_values = np.nan_to_num(grid_values, nan=np.nanmean(values)).astype(int)
 
 # Create a boolean array for voxel plotting
 voxelarray = grid_values >= 0  # want to plot all of them for now
-# voxelarray = grid_values == 3  
-
-# # Create a color map for visualization
-# norm = plt.Normalize(grid_values.min(), grid_values.max())
-# colors = plt.cm.tab10(norm(grid_values % 10))
-
-# # Mask out the transparent areas (where voxelarray is False)
-# colors = np.where(voxelarray[..., None], colors, 0)
-
-
-
 
 # Create a consistent color mapping for visualization
 unique_codes = np.unique(lithology_df['lithology_code'])
@@ -54,9 +46,6 @@ color_map = plt.cm.tab10
 colors = np.zeros(grid_values.shape + (4,))
 for code in unique_codes:
     colors[grid_values == code] = color_map(code / len(unique_codes))
-
-
-
 
 
 
@@ -86,21 +75,70 @@ ax2.set_xlabel('X')
 ax2.set_ylabel('Y')
 ax2.set_title(f'Z Slice at index {slice_index}')
 
+fig.savefig("demo.svg", dpi=300, bbox_inches="tight")
+
 plt.show()
 
 
-# Plot all the slices (horizontal)
-for i in range(50):
-    slice_index = 25  # Change this index to get different slices
+
+# Plot the different voxel volumes (1 plot)
+voxelarray = grid_values >= 0
+fig = plt.figure(figsize=(30, 15))
+ax1 = fig.add_subplot(231, projection='3d')
+ax1.voxels(voxelarray, facecolors=colors, edgecolor='k')
+for i, code in enumerate(unique_codes):
+    voxelarray = grid_values == code
+    ax = fig.add_subplot(int(f'23{i+2}'), projection='3d')
+    ax.voxels(voxelarray, facecolors=colors, edgecolor='k')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+fig.savefig("demo_voxcode.svg", dpi=300, bbox_inches="tight")
+plt.show()
+
+
+# Plot the different voxel volumes (seperate plots)
+voxelarray = grid_values >= 0
+fig = plt.figure(figsize=(10, 10))
+ax1 = fig.add_subplot(111, projection='3d')
+ax1.voxels(voxelarray, facecolors=colors, edgecolor='k')
+ax1.set_xlabel('X')
+ax1.set_ylabel('Y')
+ax1.set_zlabel('Z')
+fig.savefig(f"demo_voxcodeall.svg", dpi=300, bbox_inches="tight")
+plt.show()
+for code in unique_codes:
+    voxelarray = grid_values == code
+    fig = plt.figure(figsize=(10, 10))
+    ax1 = fig.add_subplot(111, projection='3d')
+    ax1.voxels(voxelarray, facecolors=colors, edgecolor='k')
+    ax1.set_xlabel('X')
+    ax1.set_ylabel('Y')
+    ax1.set_zlabel('Z')
+    fig.savefig(f"demo_voxcode{code}.svg", dpi=300, bbox_inches="tight")
+    plt.show()
+    
+
+# Plot all the slices (horizontal X-Y plane)
+for i in range(nz):
     slice_data = grid_values[:, :, i]
     slice_colors = colors[:, :, i]
     plt.imshow(slice_colors, origin='lower', extent=[x.min(), x.max(), y.min(), y.max()])
+    plt.title(f'Z Slice at index {i}')
     plt.show()
     
-# Plot all the slices (vertical)
-for i in range(50):
-    slice_index = 25  # Change this index to get different slices
+# Plot all the slices (vertical X-Z plane)
+for i in range(ny):
     slice_data = grid_values[:, i, :]
     slice_colors = colors[:, i, :]
-    plt.imshow(slice_colors, origin='lower', extent=[x.min(), x.max(), y.min(), y.max()])
+    plt.imshow(slice_colors, origin='lower', extent=[x.min(), x.max(), z.min(), z.max()])
+    plt.title(f'Y Slice at index {i}')
+    plt.show()
+
+# Plot all the slices (vertical Y-Z plane)
+for i in range(nx):
+    slice_data = grid_values[i, :, :]
+    slice_colors = colors[i, :, :]
+    plt.imshow(slice_colors, origin='lower', extent=[y.min(), y.max(), z.min(), z.max()])
+    plt.title(f'X Slice at index {i}')
     plt.show()

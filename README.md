@@ -15,4 +15,8 @@ plot isometric and 2d projection of cpt-based lithology,  soil behavior type, pe
 
 ## voxel representation
 
-![voxel representation]()
+interpolate the lithology data and slice it
+
+![voxel representation all](https://github.com/kckuei/lithology/blob/main/vox/demo.svg)
+
+![voxel representation all](https://github.com/kckuei/lithology/blob/main/vox/demo_voxcode.svg)

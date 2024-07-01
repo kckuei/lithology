@@ -83,7 +83,7 @@ plt.show()
 
 # Plot the different voxel volumes (1 plot)
 voxelarray = grid_values >= 0
-fig = plt.figure(figsize=(30, 15))
+fig = plt.figure(figsize=(30, 20))
 ax1 = fig.add_subplot(231, projection='3d')
 ax1.voxels(voxelarray, facecolors=colors, edgecolor='k')
 for i, code in enumerate(unique_codes):
@@ -93,6 +93,7 @@ for i, code in enumerate(unique_codes):
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
+plt.tight_layout()
 fig.savefig("demo_voxcode.svg", dpi=300, bbox_inches="tight")
 plt.show()
 
